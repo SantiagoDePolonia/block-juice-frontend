@@ -16,4 +16,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
   padding-bottom:200px;
+
+  /* default font */
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+
 }

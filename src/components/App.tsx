@@ -92,9 +92,15 @@ function App() {
     setCart((cart) => {
       const newCart = {...cart};
       delete newCart[itemId];
+
       return newCart;
     });
   }
+
+  const cartRows = Object.keys(cart).filter(itemId => cart[itemId].quantity).map((itemId) => {
+    const item = items.find((item) => item.id === itemId) as StoreItem;
+    return {...item, quantity: cart[itemId].quantity}
+  });
 
   return (
     <>
@@ -111,23 +117,72 @@ function App() {
           ))}
         </div>
       </Section>
-      <Section title={'My Order'}>
+
+      <Section
+        title={'My Order'}
+        titleRightContent={Object.keys(cart).length !== 0 ?
+          <div className='clear-all-button' onClick={()=> {setCart({})}}>
+            Clear All <img src='/icons/x.png' alt='Clear All' />
+          </div> : null
+        }>
+
         <div className='cart-box'>
           {Object.keys(cart).length === 0 ? 
-            <EmptyCartContent /> : null
+            <EmptyCartContent /> :
+              <div className='cart-content'>
+                <table className='table'>
+                  <tr className='cart-row-header row'>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th className='cart-product-price'>Price</th>
+                    <th className='cart-table-actions-column'>
+                      {/* Actions */}
+                    </th>
+                  </tr>
+                  {cartRows.map((cartRow) => (
+                    <tr className='cart-row row'>
+                      <td>
+                        <div className='cart-product-cell'>
+                          <div className='cart-product-image'>
+                            <img src={cartRow.imageURL} alt={cartRow.name} width="62" />
+                          </div>
+                          <div className='cart-product-details-box'>
+                            <div className='cart-product-name'>
+                              {cartRow.name}
+                            </div>
+                            <div className='cart-product-size'>
+                              {cartRow.size}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{cartRow?.quantity}x</td>
+                      <td>
+                        <div className='cart-product-price'>
+                          <div className='cart-product-price-usd'>${cartRow.priceUSD}</div>
+                          <div className='cart-product-price-eth'>~ {cartRow.priceETH} ETH</div>
+                        </div>
+                      </td>
+                      <td onClick={() => removeItem(cartRow.id)}>
+                        <img src='/icons/trash.png' alt='Delete icon' />
+                      </td>
+                    </tr>
+                  ))}
+                  </table>
+
+                </div>
           }
         </div>
       </Section>
 
       {/* TODO: Total section */}
       {Object.keys(cart).length !== 0 && (
-        <div className="content-container total-price-container">
-          <h2 className='section-title'>Total</h2>
-          <div className='total-price-box'>
+        <Section title={'Total'} titleRightContent={
+          <>
             <div className='total-price-usd'>${totalPriceUSD}</div>
             <div className='total-price-eth'>~ {totalPriceETH} ETH</div>
-          </div>
-        </div>
+          </>
+        } />
       )}
     </>
   )

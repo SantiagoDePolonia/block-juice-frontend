@@ -1,13 +1,22 @@
 
 interface SectionProps {
   title: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  className?: string;
+  titleRightContent?: React.ReactNode;
 }
 
-function Section({children, title}: SectionProps) {
+function Section({children = null, title, className, titleRightContent}: SectionProps) {
   return (
-    <div className="content-container">
-      <h2 className='section-title'>{title}</h2>
+    <div className={"content-container "+className}>
+      <div className='section-title-box'>
+        <h2 className='section-title'>{title}</h2>
+        {titleRightContent && (
+          <div className='section-title-right'>
+            {titleRightContent}
+          </div>
+        )}
+      </div>
       {children}
     </div>
   )
