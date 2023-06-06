@@ -1,0 +1,20 @@
+.items-list {
+  display:flex;
+  flex-direction: row;
+}
+.banner, .img-responsive {
+  width: 100%;
+  height: auto;
+}
+
+.content-container {
+  margin: 0 30px;
+}
+
+.section-title {
+  margin-top: 120px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 120%;
+}
