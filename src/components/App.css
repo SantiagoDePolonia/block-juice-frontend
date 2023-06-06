@@ -157,7 +157,7 @@ th, td {
 }
 
 .buy-buttons > button:disabled {
-opacity: 0.4
+  opacity: 0.4
 }
 
 .buy-metamask {
