@@ -139,6 +139,7 @@ th, td {
 }
 
 .buy-buttons > button {
+  cursor:pointer;
   width:100%;
   display: flex;
   flex-direction: row;
@@ -153,6 +154,10 @@ th, td {
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
+}
+
+.buy-buttons > button:disabled {
+opacity: 0.4
 }
 
 .buy-metamask {

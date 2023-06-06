@@ -38,7 +38,7 @@ function App() {
   const [totalPriceUSD, setTotalPriceUSD] = useState<string>("");
   const [totalPriceETH, setTotalPriceETH] = useState<string>("");
   const [tip, setTip] = useState(0);
-
+  
   // Note: It should runs only once at prod.
   // It might runs multiple times at dev.
 
@@ -104,7 +104,7 @@ function App() {
     const item = items.find((item) => item.id === itemId) as StoreItem;
     return {...item, quantity: cart[itemId].quantity}
   });
-
+  const isBuyButtonDisabled = cartRows.length === 0;
   return (
     <>
       <div>
@@ -204,10 +204,10 @@ function App() {
         } />
       )}
       <div className='content-container buy-buttons'>
-        <button className='buy-metamask'>
+        <button className='buy-metamask' disabled={isBuyButtonDisabled}>
           Pay by Metamask <img src='/icons/metamask.png' alt='Metamask icon' width="68" />
         </button>
-        <button className='buy-other'>
+        <button className='buy-other' disabled={isBuyButtonDisabled}>
           Pay by Other Wallet
         </button>
       </div>
