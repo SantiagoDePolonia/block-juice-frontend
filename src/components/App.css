@@ -85,7 +85,7 @@
   border-radius: 8px;
 }
 
-.cart-product-size, .cart-product-price-eth {
+.cart-product-size, .cart-product-price-eth, .sub-text {
   font-style: normal;
   font-weight: 500;
   font-size: 24px;
@@ -96,13 +96,71 @@
 .cart-product-price {
   text-align:right;
 }
+
 th, td {
   padding: 15px 10px;
-}
- {
-  
 }
 
 .cart-table-actions-column {
   width:36px;
+}
+
+.break-line {
+  opacity: 0.3;
+  border: 1px solid #E55315;
+  transform: rotate(180deg);
+}
+
+.try-your-luck-button {
+  justify-content: center;
+  align-items: center;
+  padding: 16px 19px;
+
+  background: #E55315;
+  border-radius: 12px;
+
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+
+  color: #FFFFFF;
+}
+
+.cell-to-right {
+  text-align: right;
+}
+
+.buy-buttons {
+  display: flex;
+  flex: auto;
+  gap: 30px;
+  
+}
+
+.buy-buttons > button {
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 24px;
+
+  height: 140px;
+  /* font */
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+}
+
+.buy-metamask {
+  background: #1C1C1C;
+  color: #FFFFFF;
+}
+
+.buy-other {
+    background: #FFF9F7;
+    color: #1C1C1C;
 }

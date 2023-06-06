@@ -35,10 +35,13 @@ function App() {
   const [items,]= useState(DEMO_ITEMS);
   const [cart, setCart]= useState<CartType>({});
 
-  const [totalPriceUSD, setTotalPriceUSD] = useState('1.00');
-  const [totalPriceETH, setTotalPriceETH] = useState('1.00');
+  const [totalPriceUSD, setTotalPriceUSD] = useState<string>("");
+  const [totalPriceETH, setTotalPriceETH] = useState<string>("");
+  const [tip, setTip] = useState(0);
+
   // Note: It should runs only once at prod.
   // It might runs multiple times at dev.
+
   useEffect(() => {
     // TODO: fetch items from server
 
@@ -129,53 +132,69 @@ function App() {
         <div className='cart-box'>
           {Object.keys(cart).length === 0 ? 
             <EmptyCartContent /> :
-              <div className='cart-content'>
-                <table className='table'>
-                  <tr className='cart-row-header row'>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th className='cart-product-price'>Price</th>
-                    <th className='cart-table-actions-column'>
-                      {/* Actions */}
-                    </th>
+            <div className='cart-content'>
+              <table className='table'>
+                <tr className='cart-row-header row'>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th className='cart-product-price'>Price</th>
+                  <th className='cart-table-actions-column'>
+                    {/* Actions */}
+                  </th>
+                </tr>
+                {cartRows.map((cartRow) => (
+                  <tr className='cart-row row' key={cartRow.id}>
+                    <td>
+                      <div className='cart-product-cell'>
+                        <div className='cart-product-image'>
+                          <img src={cartRow.imageURL} alt={cartRow.name} width="62" />
+                        </div>
+                        <div className='cart-product-details-box'>
+                          <div className='cart-product-name'>
+                            {cartRow.name}
+                          </div>
+                          <div className='cart-product-size'>
+                            {cartRow.size}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{cartRow?.quantity}x</td>
+                    <td>
+                      <div className='cart-product-price'>
+                        <div className='cart-product-price-usd'>${cartRow.priceUSD}</div>
+                        <div className='cart-product-price-eth'>~ {cartRow.priceETH} ETH</div>
+                      </div>
+                    </td>
+                    <td onClick={() => removeItem(cartRow.id)}>
+                      <img src='/icons/trash.png' alt='Delete icon' />
+                    </td>
                   </tr>
-                  {cartRows.map((cartRow) => (
-                    <tr className='cart-row row'>
-                      <td>
-                        <div className='cart-product-cell'>
-                          <div className='cart-product-image'>
-                            <img src={cartRow.imageURL} alt={cartRow.name} width="62" />
-                          </div>
-                          <div className='cart-product-details-box'>
-                            <div className='cart-product-name'>
-                              {cartRow.name}
-                            </div>
-                            <div className='cart-product-size'>
-                              {cartRow.size}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{cartRow?.quantity}x</td>
-                      <td>
-                        <div className='cart-product-price'>
-                          <div className='cart-product-price-usd'>${cartRow.priceUSD}</div>
-                          <div className='cart-product-price-eth'>~ {cartRow.priceETH} ETH</div>
-                        </div>
-                      </td>
-                      <td onClick={() => removeItem(cartRow.id)}>
-                        <img src='/icons/trash.png' alt='Delete icon' />
-                      </td>
-                    </tr>
-                  ))}
-                  </table>
-
-                </div>
+                ))}
+                <tr className='cart-row row'>
+                  <td colSpan={2}>
+                    <p>Tip us with 3% of the bill and win a prize!</p>
+                    <p className='sub-text'>Prizes are extra drink, merchs from sponsors or even a cool NFT</p>
+                  </td>
+                  {tip === 0 ?
+                    <td colSpan={2} className='cell-to-right'>
+                      <button onClick={() => setTip(3)} className='try-your-luck-button'>
+                        Try your luck!
+                      </button>
+                    </td>
+                  :
+                    <td onClick={() => setTip(0)} className='cell-to-right' colSpan={2}>
+                      <img src='/icons/trash.png' alt='Delete icon' />
+                    </td>
+                  }
+                </tr>
+              </table>
+              {/* <div className='break-line' /> */}
+            </div>
           }
         </div>
       </Section>
 
-      {/* TODO: Total section */}
       {Object.keys(cart).length !== 0 && (
         <Section title={'Total'} titleRightContent={
           <>
@@ -184,6 +203,14 @@ function App() {
           </>
         } />
       )}
+      <div className='content-container buy-buttons'>
+        <button className='buy-metamask'>
+          Pay by Metamask <img src='/icons/metamask.png' alt='Metamask icon' width="68" />
+        </button>
+        <button className='buy-other'>
+          Pay by Other Wallet
+        </button>
+      </div>
     </>
   )
 }
