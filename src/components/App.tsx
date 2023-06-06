@@ -2,6 +2,8 @@ import banner from '/banner.png'
 import './App.css'
 import { useEffect, useState } from 'react';
 import ItemCard from './ItemCard';
+import Section from './Section';
+import EmptyCartContent from './EmptyCartContent';
 
 export interface StoreItem {
   id: string;
@@ -33,6 +35,8 @@ function App() {
   const [items, setItems]= useState(DEMO_ITEMS);
   const [cart, setCart]= useState<CartType>({});
 
+  const [totalPriceUSD, setTotalPriceUSD] = useState('1.00');
+  const [totalPriceETH, setTotalPriceETH] = useState('1.00');
   // Note: It should runs only once at prod.
   // It might runs multiple times at dev.
   useEffect(() => {
@@ -40,6 +44,25 @@ function App() {
 
     // setItems() ...
   }, []);
+
+  // Note: It calculates total ETH and USD price on every cart change.
+  useEffect(() => {
+    const totalPriceUSDTemp = Object.keys(cart).reduce((acc, itemId) => {
+      const item = items.find((item) => item.id === itemId);
+      if(!item) return acc;
+      
+      return acc + (Number(item.priceUSD) * cart[itemId].quantity);
+    }, 0);
+    const totalPriceETHTemp = Object.keys(cart).reduce((acc, itemId) => {
+      const item = items.find((item) => item.id === itemId);
+      if(!item) return acc;
+      
+      return acc + (Number(item.priceETH) * cart[itemId].quantity);
+    }, 0);
+
+    setTotalPriceETH(String(totalPriceETHTemp.toFixed(6)))
+    setTotalPriceUSD(String(totalPriceUSDTemp.toFixed(2)))
+  }, [cart, setTotalPriceETH, setTotalPriceUSD, items]);
 
   const incrementItem = (itemId: string) => {
     setCart((cart) => {
@@ -78,8 +101,7 @@ function App() {
       <div>
         <img src={banner} alt="BlockJuice - logo" className="banner" />
       </div>
-      <div className="content-container">
-        <h2 className='section-title'>Choose Juice</h2>
+      <Section title={'Choose Juice'}>
         <div className="items-list">
           {items.map((item) => (
             <ItemCard item={item} cart={cart} key={item.id}
@@ -88,7 +110,25 @@ function App() {
             />
           ))}
         </div>
-      </div>
+      </Section>
+      <Section title={'My Order'}>
+        <div className='cart-box'>
+          {Object.keys(cart).length === 0 ? 
+            <EmptyCartContent /> : null
+          }
+        </div>
+      </Section>
+
+      {/* TODO: Total section */}
+      {Object.keys(cart).length !== 0 && (
+        <div className="content-container total-price-container">
+          <h2 className='section-title'>Total</h2>
+          <div className='total-price-box'>
+            <div className='total-price-usd'>${totalPriceUSD}</div>
+            <div className='total-price-eth'>~ {totalPriceETH} ETH</div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
