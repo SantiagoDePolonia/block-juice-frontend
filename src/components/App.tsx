@@ -32,7 +32,7 @@ const DEMO_ITEMS: StoreItem[] = [
 ];
 
 function App() {
-  const [items, setItems]= useState(DEMO_ITEMS);
+  const [items,]= useState(DEMO_ITEMS);
   const [cart, setCart]= useState<CartType>({});
 
   const [totalPriceUSD, setTotalPriceUSD] = useState('1.00');
