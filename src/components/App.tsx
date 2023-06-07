@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import ItemCard from './ItemCard';
 import Section from './Section';
 import EmptyCartContent from './EmptyCartContent';
+import { useAccount, useConnect, usePrepareContractWrite } from 'wagmi';
+import { InjectedConnector } from 'wagmi/connectors/injected';
+import { useContractWrite } from 'wagmi'
+import { BLOCK_JUICE_ABI } from '../constants';
 
 export interface StoreItem {
   id: string;
@@ -18,16 +22,16 @@ export type CartType = Record<string, {quantity:number}>;
 
 const DEMO_ITEMS: StoreItem[] = [
   {
-    id: "1", name: "Apple", priceETH: "0.0001", priceUSD: "1.23", size: "500 ml", imageURL: '/items/apple.png'
+    id: "0", name: "Apple", priceETH: "0.0001", priceUSD: "1.23", size: "500 ml", imageURL: '/items/apple.png'
   },
   {
-    id: "2", name: "Cherry", priceETH: "0.0002", priceUSD: "2.23", size: "500 ml", imageURL: '/items/cherry.png',
+    id: "1", name: "Cherry", priceETH: "0.0002", priceUSD: "2.23", size: "500 ml", imageURL: '/items/cherry.png',
   },
   {
-    id: "3", name: "Kiwi + Mint", priceETH: "0.0012", priceUSD: "3.23", size: "500 ml", imageURL: '/items/kiwi_mint.png',
+    id: "2", name: "Kiwi + Mint", priceETH: "0.0012", priceUSD: "3.23", size: "500 ml", imageURL: '/items/kiwi_mint.png',
   },
   {
-    id: "4", name: "Orange", priceETH: "0.0012", priceUSD: "3.00", size: "500 ml", imageURL: '/items/orange.png',
+    id: "3", name: "Orange", priceETH: "0.0012", priceUSD: "3.00", size: "500 ml", imageURL: '/items/orange.png',
   }
 ];
 
@@ -38,16 +42,44 @@ function App() {
   const [totalPriceUSD, setTotalPriceUSD] = useState<string>("");
   const [totalPriceETH, setTotalPriceETH] = useState<string>("");
   const [tip, setTip] = useState(0);
-  
-  // Note: It should runs only once at prod.
-  // It might runs multiple times at dev.
 
-  useEffect(() => {
+  // This status is used for buing flow
+  const [buyingStatus, setBuyingStatus] = useState("preparing");
+
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  })
+  const { isConnected } = useAccount()
+  // Note: The following useEffect hook should run only once at prod.
+  // It might runs multiple times at dev.
+  // useEffect(() => {
     // TODO: fetch items from server
 
     // setItems() ...
-  }, []);
+  // }, []);
+  const { config } = usePrepareContractWrite({
+    address: BLOCK_JUICE_ABI.address,
+    abi: BLOCK_JUICE_ABI.abi,
+    functionName: 'buyProduct',
+    args: [String(0),String(1),String(3)]
+  })
+  const { write } = useContractWrite(config);
+  useEffect(() => {
+    if(buyingStatus === 'connect_wallet') {
+      connect()
+    } else if(buyingStatus === 'interact_with_smart_contract') {
+      if(write) {
+        write();
+      }
+      // Make transaction based on state
+    }
+  },[buyingStatus])
 
+  useEffect(() => {
+    if(isConnected && buyingStatus !=='preparing') {
+      setBuyingStatus('interact_with_smart_contract')
+    }
+  }, [isConnected])
   // Note: It calculates total ETH and USD price on every cart change.
   useEffect(() => {
     const totalPriceUSDTemp = Object.keys(cart).reduce((acc, itemId) => {
@@ -104,7 +136,11 @@ function App() {
     const item = items.find((item) => item.id === itemId) as StoreItem;
     return {...item, quantity: cart[itemId].quantity}
   });
-  const isBuyButtonDisabled = cartRows.length === 0;
+  
+  const isBuyButtonDisabled = cartRows.length === 0 || buyingStatus !== 'preparing';
+  const handleByButtonClick = () => {
+    setBuyingStatus('connect_wallet')
+  }
   return (
     <>
       <div>
@@ -204,10 +240,10 @@ function App() {
         } />
       )}
       <div className='content-container buy-buttons'>
-        <button className='buy-metamask' disabled={isBuyButtonDisabled}>
+        <button className='buy-metamask' disabled={isBuyButtonDisabled} onClick={handleByButtonClick}>
           Pay by Metamask <img src='/icons/metamask.png' alt='Metamask icon' width="68" />
         </button>
-        <button className='buy-other' disabled={isBuyButtonDisabled}>
+        <button className='buy-other' disabled={isBuyButtonDisabled} onClick={handleByButtonClick}>
           Pay by Other Wallet
         </button>
       </div>
